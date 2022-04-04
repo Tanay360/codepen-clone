@@ -1,11 +1,11 @@
-<script lang="ts">
+<script>
     import { defineStore } from 'pinia'
     export const usePenStore = defineStore('codepens', {
       state: () => {
-        return { pens: [] as Pen[] }
+        return { pens: [] }
       },
       actions: {
-        changePens(pens: Pen[]) {
+        changePens(pens) {
           this.pens.splice(0,this.pens.length)
           Array.prototype.push.apply(this.pens, pens);
         },
@@ -17,7 +17,7 @@
         return { snackbar: false, snackbarText: '' }
       },
       actions: {
-        showSnackBar(text: string) {
+        showSnackBar(text) {
           this.snackbarText = text;
           this.snackbar = true;
         },
@@ -40,7 +40,7 @@
         startSearch() {
           this.search = true;
         },
-        changeSearch(text: string) {
+        changeSearch(text) {
           this.searchValue = text;
         },
         endSearch() {
@@ -51,14 +51,14 @@
     })
   </script>
 
-  <script setup lang="ts">
+  <script setup>
     import { Pen } from '@/database/db';
     import * as Rx from 'rxjs' 
     import localforage from 'localforage';
     import 'localforage-observable'
     import router from '@/router';
 
-    function makeid(length: number): string {
+    function makeid(length) {
         let result = '';
         let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let charactersLength = characters.length;
@@ -68,15 +68,15 @@
         return result;
     }
 
-    const getAllPens = async (): Promise<Pen[]> => {
-      const pens: Pen[] = [];
+    const getAllPens = async () => {
+      const pens = [];
       const keys = await localforage.keys()
       for (let key of keys) {
         const value = await localforage.getItem(key)
         if (typeof value === "object") {
           if (value != null) {
             try {
-              pens.push(value as Pen)
+              pens.push(value)
             } catch (e) {}
           }
         }
@@ -107,11 +107,11 @@
     const snackbarState = useSnackBarStore();
     const searchState = useSearchStore();
 
-    const changeSearch = (text: string) => {
+    const changeSearch = (text) => {
       searchState.changeSearch(text);
     }
 
-    const searchPressed = (e: KeyboardEvent) => {
+    const searchPressed = (e) => {
       if (e.keyCode == 13 || e.key == 'Enter') {
         e.preventDefault();
         search();
@@ -125,17 +125,17 @@
     }
 
     const search = async () => {
-      const pens = (await getAllPens()).filter((pen: Pen) => {
+      const pens = (await getAllPens()).filter((pen) => {
         return pen.name.toLowerCase().includes(searchState.searchValue.toLowerCase());
       })
       codePens.changePens(pens);
     }
 
-    const openPen = (id: string) => {
+    const openPen = (id) => {
       router.push(`pen?id=${id}`);
     }
 
-    const isObjectPresent = (obj: unknown) => {
+    const isObjectPresent = (obj) => {
       return obj != null && typeof obj !== "undefined"
     }
 

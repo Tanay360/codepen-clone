@@ -1,13 +1,13 @@
 import { mount } from '@cypress/vue'
-import HelloWorld from '../HelloWorld.vue'
+import HomeView from '../../views/HomeView.vue'
 
-describe('HelloWorld', () => {
+describe('HomeView', () => {
   it('playground', () => {
-    mount(HelloWorld, { propsData: { msg: 'Hello Cypress' } })
+    mount(HomeView)
   })
 
   it('renders properly', () => {
-    mount(HelloWorld, { propsData: { msg: 'Hello Cypress' } })
+    mount(HomeView)
     cy.get('h1').should('contain', 'Hello Cypress')
   })
 })

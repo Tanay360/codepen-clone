@@ -1,13 +1,13 @@
-<script lang="ts">
+<script>
   import { defineStore } from 'pinia'
   export const usePenStore = defineStore('pen', {
     state: () => {
       return {
-        pen: null as Pen | null
+        pen: null
       }
     },
     actions: {
-      changePen(pen: Pen) {
+      changePen(pen) {
         this.pen = pen;
       }
     }
@@ -18,7 +18,7 @@
         return { snackbar: false, snackbarText: '' }
       },
       actions: {
-        showSnackBar(text: string) {
+        showSnackBar(text) {
           this.snackbarText = text;
           this.snackbar = true;
         },
@@ -31,7 +31,7 @@
 
 </script>
 
-<script lang="ts" setup> 
+<script setup> 
   import MonacoEditor from '@/components/monaco-editor.vue'
   import CodePreview from '@/components/code-preview.vue';
   import { Pen } from '@/database/db'
@@ -39,7 +39,7 @@
   import router from '@/router';
   const snackbarState = useSnackBarStore();
   const penState = usePenStore();
-  function getParameterByName(name: string, url = window.location.href): string | null {
+  function getParameterByName(name, url = window.location.href) {
       name = name.replace(/[\[\]]/g, '\\$&');
       var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
           results = regex.exec(url);
@@ -65,7 +65,7 @@
       if (typeof pen === "undefined") {
         throw 'Pen is undefined!';
       }
-      penState.changePen(pen as Pen);
+      penState.changePen(pen);
       // initIframe();
     } catch (e) {
         snackbarState.showSnackBar('Could not load pen!');
@@ -77,46 +77,46 @@
   })()
 
   function initIframe() {
-    const iframeOutput = document.getElementById('code-preview') as HTMLIFrameElement;
+    const iframeOutput = document.getElementById('code-preview');
     if (iframeOutput == null) {
       console.log('Exit')
       return;
     }
-    iframeOutput.contentWindow!.document.open();
+    iframeOutput.contentWindow.document.open();
     const htmlEl = document.createElement('html');
     const headEl = document.createElement('head');
     const styleEl = document.createElement('style');
-    styleEl.innerHTML = penState.pen!.css;
+    styleEl.innerHTML = penState.pen.css;
     const st2 = document.createElement('style');
     st2.innerHTML = '* {\n color: white;\n}';
     headEl.appendChild(st2)
     headEl.appendChild(styleEl);
     htmlEl.appendChild(headEl)
     const bodyEl = document.createElement('body')
-    bodyEl.innerHTML = penState.pen!.html
+    bodyEl.innerHTML = penState.pen.html
     const scriptEl = document.createElement('script');
-    scriptEl.textContent = penState.pen!.js
+    scriptEl.textContent = penState.pen.js
     bodyEl.appendChild(scriptEl)
     htmlEl.appendChild(bodyEl)
-    iframeOutput.contentWindow!.document.appendChild(htmlEl)
+    iframeOutput.contentWindow.document.appendChild(htmlEl)
   }
 
   const iframeChange = () => {
-    const iframeOutput = document.getElementById('code-preview') as HTMLIFrameElement;
+    const iframeOutput = document.getElementById('code-preview');
     if (iframeOutput == null) {
       return;
     }
-    const dom = iframeOutput.contentWindow!.document;
+    const dom = iframeOutput.contentWindow.document;
     const styleEl = dom.querySelectorAll('style')[1]
-    styleEl.innerHTML = penState.pen!.css;
+    styleEl.innerHTML = penState.pen.css;
     const scriptEl = document.createElement('script')
-    scriptEl.textContent = penState.pen!.js
-    const bodyEl = dom.querySelector('body')!
-    bodyEl.innerHTML = penState.pen!.html
+    scriptEl.textContent = penState.pen.js
+    const bodyEl = dom.querySelector('body')
+    bodyEl.innerHTML = penState.pen.html
     bodyEl.appendChild(scriptEl)
   }
   
-  const cssChanged = async (value: string) => {
+  const cssChanged = async (value) => {
     if (penState.pen == null) {
       return;
     }
@@ -134,7 +134,7 @@
   }
 
   
-  const htmlChanged = async (value: string) => {
+  const htmlChanged = async (value) => {
     if (penState.pen == null) {
       return;
     }
@@ -152,7 +152,7 @@
   }
 
 
-  const jsChanged = async (value: string) => {
+  const jsChanged = async (value) => {
     if (penState.pen == null) {
       return;
     }
@@ -170,8 +170,8 @@
   }
 
   const deletePen = async () => {
-    await localforage.removeItem(penState.pen!.id)
-    snackbarState.showSnackBar(`Deleted ${penState.pen!.name}`)
+    await localforage.removeItem(penState.pen.id)
+    snackbarState.showSnackBar(`Deleted ${penState.pen.name}`)
     setTimeout(() => {
       closePen();
     }, 100);
@@ -182,15 +182,15 @@
     return [
       {
         name: 'html',
-        initialValue: penState.pen!.html,
+        initialValue: penState.pen.html,
         onChange: htmlChanged
       },{
         name: 'css',
-        initialValue: penState.pen!.css,
+        initialValue: penState.pen.css,
         onChange: cssChanged
       },{
         name: 'javascript',
-        initialValue: penState.pen!.js,
+        initialValue: penState.pen.js,
         onChange: jsChanged
       }
     ]
